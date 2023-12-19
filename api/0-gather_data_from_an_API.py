@@ -1,41 +1,42 @@
 #!/usr/bin/python3
 """sdjasjkdh skjdh askhdsaj khasjkd hsajkhd askjh"""
-import requests
+import json
 import sys
+import urllib.request
 
-def get_employee_todo_progress(employee_id):
-    # API endpoint for employee information
-    employee_url = f'https://jsonplaceholder.typicode.com/users/{employee_id}'
-    # API endpoint for employee's TODO list
-    todo_url = f'https://jsonplaceholder.typicode.com/todos?userId={employee_id}'
+if __name__ == '__main__':
+    USER = sys.argv[1]
+    COMPLETED = TOTAL_TASK = 0
+    TASK_LIST = ""
+    TODOS_URL = f'https://jsonplaceholder.typicode.com/todos?userId={USER}'
+    EMPLOYEE_URL = f'https://jsonplaceholder.typicode.com/users/{USER}'
 
+    # Request for the taks
+    with urllib.request.urlopen(TODOS_URL) as response:
+        todos_data = response.read().decode()
+
+    # Request for the employee info
+    with urllib.request.urlopen(EMPLOYEE_URL) as response:
+        employee_data = response.read().decode()
+
+    employee_info = {}
     try:
-        # Fetch employee information
-        employee_response = requests.get(employee_url)
-        employee_data = employee_response.json()
+        employee_taks = json.loads(todos_data)
+        employee_info = json.loads(employee_data)
+    except json.JSONDecodeError:
+        print('Response could not be serialized')
 
-        # Fetch TODO list for the employee
-        todo_response = requests.get(todo_url)
-        todo_data = todo_response.json()
+    # Get all the taks name in order and how many are complete.
+    for task in employee_taks:
+        if task['completed'] is True:
+            COMPLETED += 1
+            TASK_LIST += f"\t {task['title']}\n"
+        TOTAL_TASK += 1
 
-        # Extract relevant information
-        employee_name = employee_data['name']
-        done_tasks = [task['title'] for task in todo_data if task['completed']]
-        number_of_done_tasks = len(done_tasks)
-        total_number_of_tasks = len(todo_data)
+    employee_name = employee_info['name']
 
-        # Display the output
-        print(f"Employee {employee_name} is done with tasks ({number_of_done_tasks}/{total_number_of_tasks}):")
-        for task_title in done_tasks:
-            print(f"\t{task_title}")
+    # Format the all print for the employee taks
+    t_info = f"is done with tasks({COMPLETED}/{TOTAL_TASK}):\n{TASK_LIST[:-1]}"
+    print_employee = f"Employee {employee_name} " + t_info
 
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching data: {e}")
-
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <employee_id>")
-        sys.exit(1)
-
-    employee_id = int(sys.argv[1])
-    get_employee_todo_progress(employee_id)
+    print(print_employee)
