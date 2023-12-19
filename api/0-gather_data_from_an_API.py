@@ -30,15 +30,19 @@ if len(sys.argv) > 1:
     key = int(sys.argv[1])
     str1 = f'Employee {empl_dict[key]} is done with '
     str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
-    print(str1 + str2)
+    str_fin = str1 + str2 + '\n'
     for task in task_list:
         if task['completed'] and task['userId'] == key:
-            print('\t ' + task['title'])
+            str_fin += '\t ' + task['title'] + '\n'
+    str_fin = str_fin[:-1]
+    print(str_fin)
 else:
     for key in done_tasks.keys():
         str1 = f'Employee {empl_dict[key]} is done with '
         str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
-        print(str1 + str2)
+        str_fin = str1 + str2 + '\n'
         for task in task_list:
             if task['completed'] and task['userId'] == key:
-                print('\t ' + task['title'])
+                str_fin += '\t ' + task['title'] + '\n'
+        str_fin = str_fin[:-1]
+        print(str_fin)
