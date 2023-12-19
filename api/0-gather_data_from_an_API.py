@@ -3,47 +3,39 @@
 import requests
 import sys
 
+def get_employee_todo_progress(employee_id):
+    # API endpoint for employee information
+    employee_url = f'https://jsonplaceholder.typicode.com/users/{employee_id}'
+    # API endpoint for employee's TODO list
+    todo_url = f'https://jsonplaceholder.typicode.com/todos?userId={employee_id}'
 
-if __name__ == '__main__':
-    task_data = requests.get('https://jsonplaceholder.typicode.com/todos')
-    empl_data = requests.get('https://jsonplaceholder.typicode.com/users')
+    try:
+        # Fetch employee information
+        employee_response = requests.get(employee_url)
+        employee_data = employee_response.json()
 
-    task_str = task_data.text.replace('true', 'True').replace('false', 'False')
-    empl_str = empl_data.text.replace('true', 'True').replace('false', 'False')
+        # Fetch TODO list for the employee
+        todo_response = requests.get(todo_url)
+        todo_data = todo_response.json()
 
-    task_list = eval(task_str)
-    empl_list = eval(empl_str)
+        # Extract relevant information
+        employee_name = employee_data['name']
+        done_tasks = [task['title'] for task in todo_data if task['completed']]
+        number_of_done_tasks = len(done_tasks)
+        total_number_of_tasks = len(todo_data)
 
-    total_tasks = {}
-    done_tasks = {}
-    empl_dict = {}
+        # Display the output
+        print(f"Employee {employee_name} is done with tasks ({number_of_done_tasks}/{total_number_of_tasks}):")
+        for task_title in done_tasks:
+            print(f"\t{task_title}")
 
-    for tasks in task_list:
-        user_id = tasks['userId']
-        total_tasks[user_id] = total_tasks.get(user_id, 0) + 1
-        if tasks['completed']:
-            done_tasks[user_id] = done_tasks.get(user_id, 0) + 1
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data: {e}")
 
-    for employee in empl_list:
-        empl_dict[employee['id']] = employee['name']
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <employee_id>")
+        sys.exit(1)
 
-    if len(sys.argv) > 1:
-        key = int(sys.argv[1])
-        str1 = f'Employee {empl_dict[key]} is done with '
-        str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
-        str_fin = str1 + str2 + '\n'
-        for task in task_list:
-            if task['completed'] and task['userId'] == key:
-                str_fin += '\t ' + task['title'] + '\n'
-        str_fin = str_fin[:-1]
-        print(str_fin)
-    else:
-        for key in done_tasks.keys():
-            str1 = f'Employee {empl_dict[key]} is done with '
-            str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
-            str_fin = str1 + str2 + '\n'
-            for task in task_list:
-                if task['completed'] and task['userId'] == key:
-                    str_fin += '\t ' + task['title'] + '\n'
-            str_fin = str_fin[:-1]
-            print(str_fin)
+    employee_id = int(sys.argv[1])
+    get_employee_todo_progress(employee_id)
