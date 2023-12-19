@@ -1,42 +1,49 @@
 #!/usr/bin/python3
 """sdjasjkdh skjdh askhdsaj khasjkd hsajkhd askjh"""
-import json
+import requests
 import sys
-import urllib.request
+
 
 if __name__ == '__main__':
-    USER = sys.argv[1]
-    COMPLETED = TOTAL_TASK = 0
-    TASK_LIST = ""
-    TODOS_URL = f'https://jsonplaceholder.typicode.com/todos?userId={USER}'
-    EMPLOYEE_URL = f'https://jsonplaceholder.typicode.com/users/{USER}'
+    task_data = requests.get('https://jsonplaceholder.typicode.com/todos')
+    empl_data = requests.get('https://jsonplaceholder.typicode.com/users')
 
-    # Request for the taks
-    with urllib.request.urlopen(TODOS_URL) as response:
-        todos_data = response.read().decode()
+    task_str = task_data.text.replace('true', 'True').replace('false', 'False')
+    empl_str = empl_data.text.replace('true', 'True').replace('false', 'False')
 
-    # Request for the employee info
-    with urllib.request.urlopen(EMPLOYEE_URL) as response:
-        employee_data = response.read().decode()
+    task_list = eval(task_str)
+    empl_list = eval(empl_str)
 
-    employee_info = {}
-    try:
-        employee_taks = json.loads(todos_data)
-        employee_info = json.loads(employee_data)
-    except json.JSONDecodeError:
-        print('Response could not be serialized')
+    total_tasks = {}
+    done_tasks = {}
+    empl_dict = {}
 
-    # Get all the taks name in order and how many are complete.
-    for task in employee_taks:
-        if task['completed'] is True:
-            COMPLETED += 1
-            TASK_LIST += f"\t {task['title']}\n"
-        TOTAL_TASK += 1
+    for tasks in task_list:
+        user_id = tasks['userId']
+        total_tasks[user_id] = total_tasks.get(user_id, 0) + 1
+        if tasks['completed']:
+            done_tasks[user_id] = done_tasks.get(user_id, 0) + 1
 
-    employee_name = employee_info['name']
+    for employee in empl_list:
+        empl_dict[employee['id']] = employee['name']
 
-    # Format the all print for the employee taks
-    t_info = f"is done with tasks({COMPLETED}/{TOTAL_TASK}):\n{TASK_LIST[:-1]}"
-    print_employee = f"Employee {employee_name} " + t_info
-
-    print(print_employee)
+    if len(sys.argv) > 1:
+        key = int(sys.argv[1])
+        str1 = f'Employee {empl_dict[key]} is done with '
+        str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
+        str_fin = str1 + str2 + '\n'
+        for task in task_list:
+            if task['completed'] and task['userId'] == key:
+                str_fin += '\t ' + task['title'] + '\n'
+        str_fin = str_fin[:-1]
+        print(str_fin)
+    else:
+        for key in done_tasks.keys():
+            str1 = f'Employee {empl_dict[key]} is done with '
+            str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
+            str_fin = str1 + str2 + '\n'
+            for task in task_list:
+                if task['completed'] and task['userId'] == key:
+                    str_fin += '\t ' + task['title'] + '\n'
+            str_fin = str_fin[:-1]
+            print(str_fin)
