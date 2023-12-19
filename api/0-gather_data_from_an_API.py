@@ -2,7 +2,6 @@
 """sdjasjkdh skjdh askhdsaj khasjkd hsajkhd askjh"""
 import requests
 import sys
-import json
 
 
 task_data = requests.get('https://jsonplaceholder.typicode.com/todos')
