@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+"""sdjasjkdh skjdh askhdsaj khasjkd hsajkhd askjh"""
 import requests
 import sys
 
@@ -26,13 +28,17 @@ for employee in empl_list:
 
 if len(sys.argv) > 1:
     key = int(sys.argv[1])
-    print(f'Employee {empl_dict[key]} is done with ({done_tasks[key]}/{total_tasks[key]}) tasks:')
+    str1 = f'Employee {empl_dict[key]} is done with '
+    str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
+    print(str1 + str2)
     for task in task_list:
         if task['completed'] and task['userId'] == key:
             print('\t ' + task['title'])
 else:
     for key in done_tasks.keys():
-        print(f'Employee {empl_dict[key]} is done with ({done_tasks[key]}/{total_tasks[key]}) tasks:')
+        str1 = f'Employee {empl_dict[key]} is done with '
+        str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
+        print(str1 + str2)
         for task in task_list:
             if task['completed'] and task['userId'] == key:
                 print('\t ' + task['title'])
