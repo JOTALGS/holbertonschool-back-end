@@ -5,45 +5,20 @@ import sys
 
 
 if __name__ == '__main__':
-    task_data = requests.get('https://jsonplaceholder.typicode.com/todos')
-    empl_data = requests.get('https://jsonplaceholder.typicode.com/users')
+    URL = "https://jsonplaceholder.typicode.com"
 
-    task_str = task_data.text.replace('true', 'True').replace('false', 'False')
-    empl_str = empl_data.text.replace('true', 'True').replace('false', 'False')
+    user = requests.get(f'{URL}/users/{sys.argv[1]}').json()
+    user_name = user["name"]
 
-    task_list = eval(task_str)
-    empl_list = eval(empl_str)
+    todo_list = requests.get(f'{URL}/users/{sys.argv[1]}/todos').json()
 
-    total_tasks = {}
-    done_tasks = {}
-    empl_dict = {}
+    done_tasks, t_tasks = 0, 0
+    for task in todo_list:
+        if task["completed"] is True:
+            done_tasks = done_tasks + 1
+        t_tasks = t_tasks + 1
 
-    for tasks in task_list:
-        user_id = tasks['userId']
-        total_tasks[user_id] = total_tasks.get(user_id, 0) + 1
-        if tasks['completed']:
-            done_tasks[user_id] = done_tasks.get(user_id, 0) + 1
-
-    for employee in empl_list:
-        empl_dict[employee['id']] = employee['name']
-
-    if len(sys.argv) > 1:
-        key = int(sys.argv[1])
-        str1 = f'Employee {empl_dict[key]} is done with '
-        str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
-        str_fin = str1 + str2 + '\n'
-        for task in task_list:
-            if task['completed'] and task['userId'] == key:
-                str_fin += '\t ' + task['title'] + '\n'
-        str_fin = str_fin[:-1]
-        print(str_fin)
-    else:
-        for key in done_tasks.keys():
-            str1 = f'Employee {empl_dict[key]} is done with '
-            str2 = f'({done_tasks[key]}/{total_tasks[key]}) tasks:'
-            str_fin = str1 + str2 + '\n'
-            for task in task_list:
-                if task['completed'] and task['userId'] == key:
-                    str_fin += '\t ' + task['title'] + '\n'
-            str_fin = str_fin[:-1]
-            print(str_fin)
+    print(f"Employee {user_name} is done with tasks({done_tasks}/{t_tasks}):")
+    for task in todo_list:
+        if task["completed"] is True:
+            print(f"\t {task['title']}")
