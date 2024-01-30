@@ -11,15 +11,7 @@ if __name__ == '__main__':
     user = requests.get(f'{URL}/users/{sys.argv[1]}').json()
     todo_list = requests.get(f'{URL}/users/{sys.argv[1]}/todos').json()
 
-    filename = f"{user['id']}.csv"
-    with open(filename, "w", newline="") as csvfile:
-        writer = csv.writer(csvfile, quoting=csv.QUOTE_ALL)
-
-        for task in todo_list:
-            writer.writerow([
-                user['id'],
-                user['username'],
-                task['completed'],
-                task['title']
-            ])
-        filename.close()
+    fn = f"{user['id']}.csv"
+    with open(fn, 'w', encoding='utf-8') as f:
+            for task in todo_list:
+                f.write(f"{task['userId']}, {user['name']}, {task['completed']}, {task['title']}\n")
