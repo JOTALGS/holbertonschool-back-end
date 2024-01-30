@@ -27,7 +27,6 @@ if __name__ == '__main__':
     except json.JSONDecodeError:
         print('Response could not be serialized')
 
-
     # Get all the taks name in order and how many are complete.
     tasks_list = []
     for task in employee_taks:
