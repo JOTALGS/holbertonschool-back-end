@@ -22,3 +22,4 @@ if __name__ == '__main__':
                 task['completed'],
                 task['title']
             ])
+        filename.close()
