@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 """sdjasjkdh skjdh askhdsaj khasjkd hsajkhd askjh"""
+import csv
 import requests
 import sys
-import csv
 
 
 if __name__ == '__main__':
