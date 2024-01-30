@@ -32,7 +32,7 @@ def employee_progress():
                 progress[user["id"]].append(task_dict)
 
         f.write(json.dumps(progress))
-        
+
 
 if __name__ == "__main__":
     employee_progress()
